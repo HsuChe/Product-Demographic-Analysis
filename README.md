@@ -25,9 +25,9 @@ Sales analysis is critical for business decisions. In this homework, we will be 
 Features of the dataset:
 * The in-game purchases dataset contains the following columns:
     * Purchase ID: **Unique ID for each in-game purchase**
-    * SN: **The screen name of the purchasee**
-    * Age: **The age of the purchasee**
-    * Gender: **The gender of the purchasee**
+    * SN: **The screen name of the customer**
+    * Age: **The age of the custoemr**
+    * Gender: **The gender of the customer**
     * Item ID: **Unique ID for the item in the transaction**
     * Item Name: **The name of the item in the transaction**
     * Prices: **The price of the transaction**
@@ -46,263 +46,201 @@ The homework will present various business indicator to generate. The following 
 * Top performing item based on transaction quantity and total price.
 
 <!-- GETTING STARTED -->
-## Processing the csv and make it into a easier to use dataset.
+## Processing the csv 
 
-Open the csv with csv.reader() and using a for loop to iterate through each row and adding them to a list.
+Open the csv with pd.read_csv() and create the DataFrame with it. 
 
-* For loop to add to list
+* generating DataFrame from the csv. 
   ```sh
-  csv_list = []
-  for row in csv_read:
-    csv_list.append(row)
+  import pandas as pd
+  file_to_load = "Resources/purchase_data.csv"
+  purchase_data = pd.read_csv(file_to_load)
   ```
 
-After generating the csv list, find the total number of months being accounted for. To do this, we will find the index of the rows.
+### Finding total unique players in the dataset.
 
-* Finding the total month accounted for.
+After generating the DataFrame, we will calculate the total unique player count in the dataset.
+
+* finding the total unique players in the dataset. 
   ```sh
-  total_month = len(list)
+    total_players = len(purchase_data['SN'].unique())
+    total_players_df = pd.DataFrame({'Total Players':[total_players]})
+    total_players_df
   ```
 
-### Finding the total net profit/loss
+### Overall purchasing analysis
 
-To find the totla net profit / loss, we will be using a loop that will iterate through each row in the data list and add up all of the values from loss/profit columns
+Next, we are tasked to find various business analysis on the dataset. 
 
-* Total Profit Function:
+* we are looking for unique items, average price, purchase count, and total revenue:
   ```sh
-  def total_profit(list):
-    net = 0
-    for month in range(1,len(list)):
-        net = net + int(list[month][1])
-    return net  
+  item_unique = len(purchase_data['Item ID'].unique())
+  average_price = purchase_data['Price'].mean()
+  total_purchase = len(purchase_data['Purchase ID'])
+  total_revenue = purchase_data['Price'].sum()
   ```
 
-### Average month to month change.
-
-Next, we find the average change month to month. The difference between the months will be put into a list.
-
-* Headers for generated columns
+* we will generate a dictionary for formatting into a summary table DataFrame:
   ```sh
-  def month_change(list):
-    change_list = []
-    for month in range(1, len(list)-1):
-        current_price, next_price = int(list[month][1]), int(list[month + 1][1])
-        change = next_price - current_price
-        change_list.append(change)
-    return change_list
+  df_dict = {
+    'Number of Unique Items': item_unique,
+    'Average Price': average_price,
+    'Number of Purchases': total_purchase,
+    'Total Revenue': total_revenue,
+    }
   ```
 
-## Calculating the avearge change in profit / loss
-
-The average change in profit / loss is the sum of the change list divided by the length of the change list. 
-
-* Avearge change in profit and losses month to month.  
-    ```sh
-    def average_profit(change_list):
-            average_change = sum(change_list) / len(change_list)
-            average_change = round(average_change)
-        return average_change
-    ```
-
-## Calculating the greatest increase and decrease in profit / loss month to month
-
-The great increase and decrease is calculated by calculating the max and min of the change list and while referencing their index location to find the months that these changes happened. 
-
-* Finding the highest increase and decrease in profit / loss in the dataset.
+* then we will create the DataFrame from the dictionary:
   ```sh
-  def greatest_change(list):
-    change_list = month_change(list)
-    header_loc = 1
-    month_loc = 1
-    # find the highest and lowest monthly changes in the monnthly changes list
-    greatest_increase, greatest_decrease = max(change_list), min(change_list) 
-    # find the specific date that the highest and lowest monthly changes take place in.
-    gi_month = list[change_list.index(greatest_increase) + header_loc + month_loc][0]
-    gd_month = list[change_list.index(greatest_decrease) + header_loc + month_loc][0]
-    return gi_month, gd_month, greatest_increase, greatest_decrease
+    purchase_analysis_df = pd.DataFrame(df_dict, index = [0])
+    }
   ```
 
-The fact that our opening price will be extracted after the current iteration of unique value is calculated, we would have to calculate the price change year on year as well as the percentage change before updating a new opening price from the conditional.
+### Analysis based on gender.
 
-* Store Yearly Change and Yearly Percent Change to memory
+We will analyze the data with gender as the focus. The first analysis we will perform are general analysis such as the number of players based on gender and percentage of players based on specific gender.
+
+* Generating data using the groupby method
   ```sh
-  YearlyChange = ClosingPrice - OpeningPrice
+  total_count_gender = purchase_data.groupby('Gender').nunique()['SN']
+
+  percentage_players = total_count_gender / total_players * 100
+
+  gender_demographics = pd.DataFrame({"Total Count": total_count,"Percentage of Players": percentage_players.map("{:,.2f}%".format)}, index = ['Male','Female','Other / Non-Disclosed'])
+  ```
+Next we will calculate specific sales indicators based on gender. 
+
+* calculate the indicators we are looking for. 
+  ```sh
+    gender_group = purchase_data.groupby('Gender')
+
+    purchase_count = gender_group['Purchase ID'].count()
+    avearge_purchase_price = gender_group['Price'].mean()
+    total_purchase_value = gender_group['Price'].sum()
+
+    avg_total_purchase_per = total_purchase_value/  total_count_gender
   ```
 
-## Generate the summary table as a string.
+Next we will input all the calculations into a summary table. 
 
-We for variables for each of the information we calculated before and map them into a string. 
+* create the summary table dataframe and format the numbers to currency with two decimal places.
+  ```sh
+    summary_table = pd.DataFrame()
+    summary_table['Purchase Count'] = purchase_count
 
-* Mapping the calculated value into the string. 
+    summary_table['Average Purchase Price'] = avearge_purchase_price.map("${:,.2f}".format)
+    summary_table['Total Purchase Value'] = total_purchase_value
+
+    summary_table['Average Purchase Total per Person by Gender'] = avg_total_purchase_per.map("${:,.2f}".format)
+
+  ```
+
+### Analysis based on age.
+
+Next we will be analyzing the dataset with focus on age. The best way to analyze ranges of number is to assign each range to a specic bin and groupby using the bins as indexes.
+
+* generate the bins that we wish to analyze age with.
+  ```sh
+  bins = [0,9,14,19,24,29,34,39,150]
+  bin_names = ["<10","10-14","15-19","20-24",'25-29','30-34','35-39','40+']
+  ```
+Next, create the column series with the bin that we just set. 
+
+* create the series using the pd.cut method and add the series into the dataset as a column. 
   ``` sh
-  def summary_table(list):
-    # Define the variables that will be used inn the summary table f' string
-    total_month = len(list)
-    net = total_profit(list)
-    average_change = average_profit(month_change(list))
-    gi_month, gd_month, greatest_increase, greatest_decrease = greatest_change(list)
-    report = f'''
-    Financial Analysis
-    ----------------------------
-    Total Months: {total_month}
-    Total: {net}
-    Average Change: ${average_change}
-    Greatest Increase in Profits: "{gi_month} ({greatest_increase})"
-    Greatest Decrease in Profits: "{gd_month} ({greatest_decrease})"
-    '''
-    # return the string
-    return report
+  bin_column = pd.cut(df_checkpoint['Age'], bins, labels = bin_names, include_lowest = True)
+  
+  purchase_data_bins = df_checkpoint.copy()
+  purchase_data_bins['Age Bin'] = bin_column
   ```
 
-## Generating the text file and terminal message with the summary table.
+Next we will do our calculations and put all the information into a summary table. 
 
-To generate the text file, we will be writing the string information into it.
-
-* Writing the information into a text file
+* we can use the nunique() method on the series group object to calculate the count of unique SN based on our bins
   ```sh
-  def analysis_gen(string, path):
-    with open (path,"w") as file1:
-            file1.write(string)
+    
+    total_count_age = purchase_data_bins.groupby('Age Bin').nunique()['SN']
+    percentage_players = total_count_age / total_players * 100
+
+    age_demographics = pd.DataFrame({"Total Count": total_count_age,"Percentage of Players": percentage_players.map("{:,.2f}%".format)}, index = bin_names)
+
   ```
 
-## After everything is generated, we complete the PyBank portion of the assignment.
+### Finding the top spenders
 
-<br>
-<br>
-<br>
+We will usd the dataset to generate the highest five spenders in terms of total purchases.
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
-
-![hero image](https://github.com/HsuChe/python-challenge/blob/f3e0d54ab0d2365f8a35dd1a83ef981b05c49644/Image/PyPoll_Hero.jpg)
-
-Visualizing and processing voting data is how we can find our winner and calculate critical descriptions through analyzing polling data. 
-
-Features of the dataset:
-* Voter ID: **The unique ID that each vote is identified by**
-* County: **Name of the county where the vote was casted**
-* Candidate: **Name of the candidate the vote was casted for**
-
-* Download Dataset click [HERE](https://github.com/HsuChe/python-challenge/blob/f3e0d54ab0d2365f8a35dd1a83ef981b05c49644/PyPoll/Resources/election_data.csv)
-
-The homework is interested generating a few specific items for the summary table.
-
-* Total of votes casted
-* Percentage of the total vote each candidate received.
-* Winner of the election.
-
-<!-- GETTING STARTED -->
-## Processing the csv and make it into an dataset that is easier to manipulate.
-
-Open the csv with csv.reader() and using a for loop to iterate through each row and adding them to a list.
-
-* For loop to add to list
+* generate the groupby object based on SN and then calculate the indicators we are looking for. 
   ```sh
-  csv_list = []
-  for row in csv_read:
-    csv_list.append(row)
+    sn_group = purchase_data_bins.groupby("SN")
+
+    total_purchase_value = sn_group['Price'].sum()
+    average_purchase_price = sn_group['Price'].mean()
+    purchase_count = sn_group['Price'].count()
   ```
 
-After generating the csvlist, find the total number of votes being accounted for. To do this, we will find the index of the rows.
+Next we will create a new DataFrame with the indicators then sort the DataFrame descending based on total purchase. 
 
-* Finding the total votes accounted for.
-  ```sh
-  total_vote = len(list)
-  ```
-
-### Find information for each candidate
-
-## Preprocessing information and putting them into a dictionary.
-
-To find the specific information for each candidate, the first step is to find the list of unique candidates, to do this, we can generate a list and append each name into a list when a new iteration appears.
-
-* Unique candidate function:
-  ```sh
-  def UniqueCandidate(datalist):
-    UniqueList = []
-    for vote in range(1, len(datalist)):
-        if datalist[vote][2] not in UniqueList:
-            UniqueList.append(datalist[vote][2])
-    return UniqueList
-  ```
-
-### Finding out the amount of votes each candidate received.
-
-We can find out the amount of votes each candidate received based on unique candidate names.
-
-* Candidate vote counter:
-  ```sh
-  def CandidateCounter(candidate, datalist):
-    CandidateCount = 0
-    for vote in datalist:
-        if vote[2] == candidate:
-            CandidateCount += 1
-    return CandidateCount
-  ```
-
-## Find the winner and total votes. 
-
-To find the winner, we will iterate through each candidate within unique candidate information and then find the name through index of the maximum vote count. To do this, we will first create a dictionary with unique candidate names and add voting information based on candidates to the dictionary. 
-
-* Generating and adding candidate voting information to dictionary
-    ```sh
-    CandidateInfo = {}
-    for candidate in UniqueCandidate(datalist):
-        CandidateCount = CandidateCounter(candidate,datalist)
-        PercentVote = (CandidateCount/totalvote)*100
-        StringConvert = "%.3f" % PercentVote + "%"
-        CandidateInfo[candidate] = [CandidateCount,StringConvert]
-    ```
-
-* Comparing candidate vote count to find the winner  
-    ```sh
-    def winner(CandidateDict):
-        winner = ''
-        winning_vote = 0
-        for candidate in CandidateDict:
-            if CandidateDict[candidate][0] > winning_vote:
-                winning_vote = CandidateDict[candidate][0]
-                winner = candidate
-        return winner
-    ```
-* Putting the rest of the information into the dictionary. 
-    ```sh
-    CandidateInfo['Winner'] = winner(CandidateInfo)
-    CandidateInfo['Total'] = totalvote
-    ```
-
-## Generate the summary table as a string.
-
-We for variables for each of the information we calculated before and map them into a string. 
-
-* Mapping the calculated value into the string. 
+* generate the summary table and sort the data based on total purchases
   ``` sh
-  def parser(CandidateDict):
-    string = f'''
-        Election Results
-        -------------------------
-        Total Votes: {CandidateDict['Total']}
-        -------------------------
-        Khan: {CandidateDict['Khan'][1]} ({CandidateDict['Khan'][0]})
-        Correy: {CandidateDict['Correy'][1]} ({CandidateDict['Correy'][0]})
-        Li: {CandidateDict['Li'][1]} ({CandidateDict['Li'][0]})
-        O'Tooley: {CandidateDict["O'Tooley"][1]} ({CandidateDict["O'Tooley"][0]})
-        -------------------------
-        Winner: {CandidateDict['Winner']}
-        -------------------------
-        '''
-    return string
+    summary_table = pd.DataFrame()
+    summary_table['Purchase Count'] = purchase_count
+    summary_table['Average Purchase Price'] = average_purchase_price
+    summary_table['Total Purchase Value'] = total_purchase_value
+    summary_table = summary_table.sort_values(['Total Purchase Value'], ascending = False).head()
   ```
 
-## Generating the text file and terminal message with the summary table.
+Lastly, we will formate the currency cells and transform it into strings with two decimal places. 
 
-To generate the text file, we will be writing the string information into it.
-
-* Writing the information into a text file
+* format the currency columns to two decimal places
   ```sh
-  def analysis_gen(string, path):
-    with open (path,"w") as file1:
-            file1.write(string)
+    summary_table['Total Purchase Value'] = summary_table['Total Purchase Value'].map("${:,.2f}".format)
+    
+    summary_table['Average Purchase Price'] = summary_table['Average Purchase Price'].map("${:,.2f}".format)
   ```
 
-## After everything is generated, we complete the PyPoll portion of the assignment.
+### Finding the most popular item
+
+We will use the dataset to find the top five most popular items based on purchase count.
+
+* generate the groupby object based on item ID and Item name, then calculate the indicators we are looking for. 
+  ```sh
+    item_group = purchase_data_bins.groupby(['Item ID','Item Name'])
+
+    total_purchase_value = item_group['Price'].sum()
+    average_purchase_price = item_group['Price'].mean()
+    purchase_count = item_group['Price'].count()
+  ```
+
+Next we will create a new DataFrame with the indicators then sort the DataFrame descending based on purchase count. 
+
+* generate the summary table and sort the data based on total purchases descending
+  ``` sh
+    summary_table = pd.DataFrame()
+    summary_table['Purchase Count'] = purchase_count
+    summary_table['Average Purchase Price'] = average_purchase_price
+    summary_table['Total Purchase Value'] = total_purchase_value
+
+    summary_table_pop = summary_table.sort_values(['Purchase Count'], ascending = False).head()
+  ```
+
+Lastly, we will formate the currency cells and transform it into strings with two decimal places. 
+
+* format the currency columns to two decimal places
+  ```sh
+    summary_table_pop['Total Purchase Value'] = summary_table_pop['Total Purchase Value'].map("${:,.2f}".format)
+    summary_table_pop['Average Purchase Price'] = summary_table_pop['Average Purchase Price'].map("${:,.2f}".format)
+  ```
+
+### Finding the most profitable items
+
+We will use the dataset to find the top five most profitable items based on total revenue.
+
+* Using the summary table generated for items from the most popular, we will set new sorting parameters to Total Purchase Value. 
+  ```sh
+    summary_table = summary_table.sort_values(['Total Purchase Value'], ascending = False).head()
+
+    summary_table['Total Purchase Value'] = summary_table['Total Purchase Value'].map("${:,.2f}".format)
+    summary_table['Average Purchase Price'] = summary_table['Average Purchase Price'].map("${:,.2f}".format)
+  ```
+
