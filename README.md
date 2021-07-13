@@ -18,7 +18,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-![hero image](https://github.com/HsuChe/python-challenge/blob/f3e0d54ab0d2365f8a35dd1a83ef981b05c49644/Image/PyBank_Hero.jpg)
+![hero image](https://github.com/HsuChe/pandas-challenge/blob/d552ad43a81eb152fc208a1a150dde6396f97a4f/images/fantasy-3077928_1920.jpg)
 
 Month to month analysis is critical to making operating decisions. For this homework, we are going to generate commonly used business metrics based on the monthly financial information.
 
