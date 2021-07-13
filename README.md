@@ -2,12 +2,12 @@
 <br />
 <p align="center">
 
-  <h3 align="center">Stock Ticker Summary Table</h3>
+  <h3 align="center">Heroes Of Pymoli</h3>
 
   <p align="center">
-     An explanation for the creation of a summary table from ticker information
+     Performing data analysis using pandas
     <br />
-    <a href="https://github.com/HsuChe/python-challenge"><strong>Project Github URL »</strong></a>
+    <a href="https://github.com/HsuChe/pandas-challenge"><strong>Project Github URL »</strong></a>
     <br />
     <br />
   </p>
@@ -20,24 +20,30 @@
 
 ![hero image](https://github.com/HsuChe/pandas-challenge/blob/d552ad43a81eb152fc208a1a150dde6396f97a4f/images/fantasy-3077928_1920.jpg)
 
-Month to month analysis is critical to making operating decisions. For this homework, we are going to generate commonly used business metrics based on the monthly financial information.
+Sales analysis is critical for business decisions. In this homework, we will be using pandas library to analyze in game purchase data from Heroes of Pymoli.
 
 Features of the dataset:
-* The dataset is divided primarily between three sheets for each of the years that are being analyzed, starting with 2014 and ending in 2016.
-* The following are columns provided by the dataset: 
-    * Date: **The date that the information was generated**
-    * Profit/Loss: **The profit and loss from a month before**
+* The in-game purchases dataset contains the following columns:
+    * Purchase ID: **Unique ID for each in-game purchase**
+    * SN: **The screen name of the purchasee**
+    * Age: **The age of the purchasee**
+    * Gender: **The gender of the purchasee**
+    * Item ID: **Unique ID for the item in the transaction**
+    * Item Name: **The name of the item in the transaction**
+    * Prices: **The price of the transaction**
+
 * The dataset is in the csv file format with delimiter of comma.
 
-* Download Dataset click [HERE](https://github.com/HsuChe/python-challenge/blob/f3e0d54ab0d2365f8a35dd1a83ef981b05c49644/PyBank/Resources/budget_data.csv)
+* Download Dataset click [HERE](https://github.com/HsuChe/pandas-challenge/blob/0f628f032da5f551f4000b80c5b4ccd4dd77c3ab/HeroesOfPymoli/Resources/purchase_data.csv)
 
-The homework is interested generating a few specific items for the summary table.
+The homework will present various business indicator to generate. The following information will be the focus for analysis.
 
-* Total months accounted for in the dataset.
-* Aggregate change given the entire dataset.
-* Average change month to month.
-* Month with the greatest increase in profits.
-* Month with the greatest decrease in profits.
+* Unique Player Count.
+* Overall purchasing analysis.
+* Player and purchase analysis based on gender.
+* Player and purchase analysis based on age.
+* Top spender.
+* Top performing item based on transaction quantity and total price.
 
 <!-- GETTING STARTED -->
 ## Processing the csv and make it into a easier to use dataset.
