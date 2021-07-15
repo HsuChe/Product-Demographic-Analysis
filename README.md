@@ -84,9 +84,9 @@ Next, we are tasked to find various business analysis on the dataset.
   ```sh
   df_dict = {
     'Number of Unique Items': item_unique,
-    'Average Price': average_price,
+    'Average Price': f"${round(average_price,2)}",
     'Number of Purchases': total_purchase,
-    'Total Revenue': total_revenue,
+    'Total Revenue': f"${round(total_revenue,2)}",
     }
   ```
 
@@ -244,3 +244,8 @@ We will use the dataset to find the top five most profitable items based on tota
     summary_table['Average Purchase Price'] = summary_table['Average Purchase Price'].map("${:,.2f}".format)
   ```
 
+### Conclusion
+
+The general trend for the sales dataset is that male customers are overwhelmingly better target demographic than female. All digital prducts should be geared to cater to male audience.
+
+The highest spending per person is also no more than $60 so bundling items to get more people to spend near the limit would be a good way to reach that maximum per person potential more often. Bundle kits ranging from $30 - $60 can be considered. 
